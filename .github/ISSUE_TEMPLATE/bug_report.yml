@@ -1,0 +1,34 @@
+name: Bug Report
+description: Report a bug
+title: "[BUG] "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      placeholder: A brief description of the observed bug
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: "- List of steps taken to reproduce the issue"
+    validations:
+      required: false
+  - type: textarea
+    id: code
+    attributes:
+      label: Relevant Code
+      placeholder: Code snippet or link to problematic code (if known)
+    validations:
+      required: false
+  - type: textarea
+    id: notes
+    attributes:
+      label: Other Notes
+      placeholder: "Any other notes"
+    validations:
+      required: false

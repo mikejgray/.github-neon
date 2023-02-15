@@ -1,0 +1,27 @@
+name: Feature Request
+description: Request a new feature
+title: "[FEAT] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      placeholder: 1-2 sentences summarizing the requested feature
+    validations:
+      required: true
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Initial Implementation Requirements
+      placeholder: "- list of tasks/changes required to achieve the Objective"
+    validations:
+      required: true
+  - type: textarea
+    id: considerations
+    attributes:
+      label: Other Considerations
+      placeholder: "- list of considerations or open issues relating to the Objective"
+    validations:
+      required: false
