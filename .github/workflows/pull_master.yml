@@ -1,0 +1,25 @@
+name: Pull to Master
+on:
+  workflow_call:
+    inputs:
+      pr_reviewer:
+        required: false
+        type: string
+        default: neonreviewers
+      pr_assignee:
+        required: false
+        type: string
+        default: neondaniel
+
+jobs:
+  pull_changes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: pull-request-action
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_reviewer: ${{ inputs.pr_reviewer }}
+          pr_assignee: ${{ inputs.pr_assignee }}
+          pr_draft: true
