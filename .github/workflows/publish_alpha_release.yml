@@ -52,4 +52,5 @@ jobs:
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
+          packages_dir: action/package/dist/
           password: ${{secrets.PYPI_TOKEN}}
