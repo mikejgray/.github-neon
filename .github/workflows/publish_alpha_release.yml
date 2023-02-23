@@ -28,7 +28,6 @@ jobs:
         with:
           path: action/github/
           repository: NeonGeckoCom/.github
-          ref: FEAT_SharedScripts
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
