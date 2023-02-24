@@ -1,0 +1,34 @@
+name: Skill Unit Tests
+on:
+  workflow_call:
+    inputs:
+      resource_file:
+        type: string
+        default: test/test_resources.yaml
+jobs:
+  test_resources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          path: action/skill/
+      - name: Checkout Scripts Repo
+        uses: actions/checkout@v2
+        with:
+          repository: NeonGeckoCom/.github
+          path: action/github/
+      - name: Set up python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - name: Install Dependencies
+        run: |
+          sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
+          pip install --upgrade pip
+          pip install pytest mock ovos-core[skills] action/skill/
+      - name: Test Skill Resources
+        run: |
+          export RESOURCE_TEST_FILE="action/skill/${{inputs.resource_file}}"
+          pytest action/github/test/test_skill_resources.py
