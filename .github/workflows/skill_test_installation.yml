@@ -1,0 +1,37 @@
+name: Skill Installation Tests
+on:
+  workflow_call:
+    inputs:
+      branch:
+        type: string
+        default: ${{ github.ref }}
+      repository:
+        type: string
+        default: ${{ github.repository }}
+jobs:
+  test_osm_install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        python-version: [ 3.7, 3.8, 3.9, '3.10' ]
+    steps:
+      - name: Checkout Scripts Repo
+        uses: actions/checkout@v2
+        with:
+          repository: NeonGeckoCom/.github
+          path: action/github/
+      - name: Set up python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
+          pip install --upgrade pip
+          pip install pytest mock ovos-skills-manager
+      - name: Test Skill Intents
+        run: |
+          export TEST_REPO=${{inputs.repository}}
+          export TEST_BRANCH=${{inputs.branch}}
+          pytest action/github/test/test_skill_osm_install.py
