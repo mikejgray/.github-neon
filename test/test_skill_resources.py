@@ -118,7 +118,7 @@ class TestSkillLoading(unittest.TestCase):
                     registered_regex.setdefault(lang, dict())
                     regex = msg["data"]["regex"].split(
                         '<', 1)[1].split('>', 1)[0].replace(
-                        self.test_skill_id.replace('.', '_'), '').lower()
+                        self.test_skill_id.replace('.', '_'), '')
                     registered_regex[lang].setdefault(regex, list())
                     registered_regex[lang][regex].append(msg["data"]["regex"])
                 else:
@@ -134,16 +134,18 @@ class TestSkillLoading(unittest.TestCase):
                 self.assertEqual(set(registered_padatious[lang]),
                                  self.padatious_intents)
             if self.vocab:
-                self.assertEqual(set(registered_vocab[lang].keys()), self.vocab)
+                self.assertEqual(set(registered_vocab[lang].keys()),
+                                 self.vocab, registered_vocab)
             if self.regex:
-                self.assertEqual(set(registered_regex[lang].keys()), self.regex)
+                self.assertEqual(set(registered_regex[lang].keys()),
+                                 self.regex, registered_regex)
             for voc in self.vocab:
                 # Ensure every vocab file has at least one entry
                 self.assertGreater(len(registered_vocab[lang][voc]), 0)
             for rx in self.regex:
-                # Ensure every vocab file has exactly one entry
+                # Ensure every rx file has exactly one entry
                 self.assertTrue(all((rx in line for line in
-                                     registered_regex[lang][rx])))
+                                     registered_regex[lang][rx])), self.regex)
 
     def test_skill_events(self):
         events = self.default_events + list(self.adapt_intents)
