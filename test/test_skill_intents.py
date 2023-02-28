@@ -71,10 +71,13 @@ class TestSkillIntentMatching(unittest.TestCase):
                     message = Message('test_utterance',
                                       {"utterances": [utt], "lang": lang})
                     self.intent_service.handle_utterance(message)
-                    intent_handler.assert_called_once()
+                    try:
+                        intent_handler.assert_called_once()
+                    except AssertionError as e:
+                        raise AssertionError(utt) from e
                     intent_message = intent_handler.call_args[0][0]
-                    self.assertIsInstance(intent_message, Message)
-                    self.assertEqual(intent_message.msg_type, intent_event)
+                    self.assertIsInstance(intent_message, Message, utt)
+                    self.assertEqual(intent_message.msg_type, intent_event, utt)
                     for datum in data:
                         if isinstance(datum, dict):
                             name = list(datum.keys())[0]
@@ -93,7 +96,7 @@ class TestSkillIntentMatching(unittest.TestCase):
                                               str, intent_message.data)
                         if value:
                             self.assertEqual(intent_message.data.get(voc_id),
-                                             value)
+                                             value, utt)
                     intent_handler.reset_mock()
 
 
