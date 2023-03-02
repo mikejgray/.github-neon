@@ -98,7 +98,11 @@ class TestSkillLoading(unittest.TestCase):
     def test_skill_setup(self):
         self.assertEqual(self.skill.skill_id, self.test_skill_id)
         for msg in self.messages:
-            self.assertEqual(msg["context"]["skill_id"], self.test_skill_id)
+            # TODO: Patching ovos.common_play.announce which should probably add
+            #       skill_id to context (null context at time of writing)
+            skill_id = msg["context"].get("skill_id") or \
+                msg["data"].get("skill_id")
+            self.assertEqual(skill_id, self.test_skill_id, msg)
 
     def test_intent_registration(self):
         registered_adapt = list()
