@@ -154,14 +154,15 @@ class TestSkillLoading(unittest.TestCase):
     def test_skill_events(self):
         events = self.default_events + list(self.adapt_intents)
         for event in events:
-            self.assertIn(event, [e[0] for e in self.skill.events])
+            self.assertIn(event, [e[0] for e in self.skill.events], event)
 
     def test_dialog_files(self):
         for lang in self.supported_languages:
             for dialog in self.dialog:
                 file = self.skill.find_resource(f"{dialog}.dialog", "dialog",
                                                 lang)
-                self.assertTrue(os.path.isfile(file))
+                self.assertIsInstance(file, str, f"{dialog} in {self.dialog}")
+                self.assertTrue(os.path.isfile(file), dialog)
 
 
 if __name__ == "__main__":
