@@ -6,6 +6,14 @@ on:
         required: false
         type: string
         default: "3.8"
+      test_manifest:
+        required: false
+        type: boolean
+        default: false
+      manifest_ignored:
+        required: false
+        type: string
+        default: "test/**"
 jobs:
   py_build_tests:
     timeout-minutes: 15
@@ -22,4 +30,8 @@ jobs:
       - name: Build Distribution Packages
         run: |
           python setup.py bdist_wheel sdist
-
+      - name: Test Manifest
+        if: ${{ inputs.test_manifest }}
+        uses: tj-actions/check-manifest@v1
+        with:
+          args: --ignore ${{ inputs.manifest_ignored }}
