@@ -17,6 +17,9 @@ on:
       publish_pypi:
         type: boolean
         default: True
+      version_scheme:
+        type: string
+        default: semver
     outputs:
       version:
         description: Updated Alpha version
@@ -44,7 +47,11 @@ jobs:
       - name: Increment Alpha Version
         id: version
         run: |
-          python action/github/scripts/version_bump.py action/package/${{ inputs.version_file }}
+          if [ ${{ inputs.version_scheme }} == "semver" ]; then
+            python action/github/scripts/semantic_version_bump.py action/package/${{ inputs.version_file }}
+          elif [ ${{ inputs.version_scheme }} == "dated" ]; then
+            python action/github/scripts/dated_version_bump.py action/package/${{ inputs.version_file }}
+          fi
           echo ::set-output name=version::$(python action/package/${{ inputs.setup_py }} --version)
       - name: Push Version Change
         uses: stefanzweifel/git-auto-commit-action@v4
