@@ -42,7 +42,7 @@ def bump_version(version_file: str):
 
     date = datetime.now()
     date_string = f"{str(date.year)[2:]}.{date.month}.{date.day}"
-    if version.startswith(date_string):
+    if 'a' in version and not version.endswith('a'):
         alpha_ver = int(version.split('a')[1]) + 1
     else:
         alpha_ver = 1
