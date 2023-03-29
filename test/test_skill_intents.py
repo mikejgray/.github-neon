@@ -30,10 +30,11 @@ import unittest
 import yaml
 
 from os import getenv
-from mock import Mock
+from mock import Mock, patch
 from ovos_utils.messagebus import FakeBus
 from mycroft_bus_client import Message
 from ovos_plugin_manager.skills import load_skill_plugins
+from ovos_utils.log import LOG
 
 
 class TestSkillIntentMatching(unittest.TestCase):
@@ -44,19 +45,27 @@ class TestSkillIntentMatching(unittest.TestCase):
     test_intents = getenv("INTENT_TEST_FILE")
     with open(test_intents) as f:
         valid_intents = yaml.safe_load(f)
-
+    negative_intents = valid_intents.pop('unmatched intents', dict())
     from mycroft.skills.intent_service import IntentService
     bus = FakeBus()
     intent_service = IntentService(bus)
     test_skill_id = 'test_skill.test'
+    last_message = None
 
     @classmethod
     def setUpClass(cls) -> None:
         cls.skill.config_core["secondary_langs"] = list(cls.valid_intents.keys())
         cls.skill._startup(cls.bus, cls.test_skill_id)
 
+        def _on_message(msg):
+            cls.last_message = msg
+
+        cls.bus.on("message", _on_message)
+
     def test_intents(self):
         for lang in self.valid_intents.keys():
+            self.assertIsInstance(lang.split('-')[0], str)
+            self.assertIsInstance(lang.split('-')[1], str)
             for intent, examples in self.valid_intents[lang].items():
                 intent_event = f'{self.test_skill_id}:{intent}'
                 self.skill.events.remove(intent_event)
@@ -74,6 +83,7 @@ class TestSkillIntentMatching(unittest.TestCase):
                     try:
                         intent_handler.assert_called_once()
                     except AssertionError as e:
+                        LOG.error(self.last_message)
                         raise AssertionError(utt) from e
                     intent_message = intent_handler.call_args[0][0]
                     self.assertIsInstance(intent_message, Message, utt)
@@ -98,6 +108,25 @@ class TestSkillIntentMatching(unittest.TestCase):
                             self.assertEqual(intent_message.data.get(voc_id),
                                              value, utt)
                     intent_handler.reset_mock()
+
+    @patch("mycroft.skills.intent_services.padatious_service.PadatiousMatcher.match_low")
+    def test_negative_intents(self, pad_low):
+        pad_low.return_value = None
+
+        intent_failure = Mock()
+        self.intent_service.send_complete_intent_failure = intent_failure
+
+        for lang in self.negative_intents.keys():
+            for utt in self.negative_intents[lang]:
+                message = Message('test_utterance',
+                                  {"utterances": [utt], "lang": lang})
+                self.intent_service.handle_utterance(message)
+                try:
+                    intent_failure.assert_called_once_with(message)
+                    intent_failure.reset_mock()
+                except AssertionError as e:
+                    LOG.error(self.last_message)
+                    raise AssertionError(utt) from e
 
 
 if __name__ == "__main__":
