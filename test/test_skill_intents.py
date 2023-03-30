@@ -28,6 +28,7 @@
 
 import unittest
 import yaml
+import logging
 
 from os import getenv
 from mock import Mock, patch
@@ -35,6 +36,31 @@ from ovos_utils.messagebus import FakeBus
 from mycroft_bus_client import Message
 from ovos_plugin_manager.skills import load_skill_plugins
 from ovos_utils.log import LOG
+
+from mycroft.skills.intent_services.padatious_service import PadatiousMatcher
+
+LOG.level = logging.DEBUG
+
+
+class MockPadatiousMatcher(PadatiousMatcher):
+    include_med = True
+    include_low = False
+
+    def __init__(self, *args, **kwargs):
+        PadatiousMatcher.__init__(self, *args, **kwargs)
+        LOG.debug("Creating test Padatious Matcher")
+
+    def match_medium(self, utterances, lang=None, __=None):
+        if not self.include_med:
+            LOG.info(f"Skipping medium confidence check for {utterances}")
+            return None
+        PadatiousMatcher.match_medium(self, utterances, lang=lang)
+
+    def match_low(self, utterances, lang=None, __=None):
+        if not self.include_low:
+            LOG.info(f"Skipping low confidence check for {utterances}")
+            return None
+        PadatiousMatcher.match_low(self, utterances, lang=lang)
 
 
 class TestSkillIntentMatching(unittest.TestCase):
@@ -109,10 +135,15 @@ class TestSkillIntentMatching(unittest.TestCase):
                                              value, utt)
                     intent_handler.reset_mock()
 
-    @patch("mycroft.skills.intent_services.padatious_service.PadatiousMatcher.match_low")
-    def test_negative_intents(self, pad_low):
-        pad_low.return_value = None
-
+    @patch("mycroft.skills.intent_service.PadatiousMatcher",
+           new=MockPadatiousMatcher)
+    def test_negative_intents(self):
+        test_config = self.negative_intents.pop('config', None)
+        if test_config:
+            MockPadatiousMatcher.include_med = test_config.get('include_med',
+                                                               True)
+            MockPadatiousMatcher.include_low = test_config.get('include_low',
+                                                               False)
         intent_failure = Mock()
         self.intent_service.send_complete_intent_failure = intent_failure
 
