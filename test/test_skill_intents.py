@@ -72,7 +72,7 @@ class TestSkillIntentMatching(unittest.TestCase):
     with open(test_intents) as f:
         valid_intents = yaml.safe_load(f)
     negative_intents = valid_intents.pop('unmatched intents', dict())
-    common_query = valid_intents.pop("common query")
+    common_query = valid_intents.pop("common query", dict())
     from mycroft.skills.intent_service import IntentService
     bus = FakeBus()
     intent_service = IntentService(bus)
