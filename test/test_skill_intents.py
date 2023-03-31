@@ -72,6 +72,7 @@ class TestSkillIntentMatching(unittest.TestCase):
     with open(test_intents) as f:
         valid_intents = yaml.safe_load(f)
     negative_intents = valid_intents.pop('unmatched intents', dict())
+    common_query = valid_intents.pop("common query")
     from mycroft.skills.intent_service import IntentService
     bus = FakeBus()
     intent_service = IntentService(bus)
@@ -158,6 +159,49 @@ class TestSkillIntentMatching(unittest.TestCase):
                 except AssertionError as e:
                     LOG.error(self.last_message)
                     raise AssertionError(utt) from e
+
+    def test_common_query(self):
+        qa_callback = Mock()
+        qa_response = Mock()
+        self.skill.events.add('question:action', qa_callback)
+        self.skill.events.add('question:query.response', qa_response)
+        for lang in self.common_query.keys():
+            for utt in self.common_query[lang]:
+                if isinstance(utt, dict):
+                    data = list(utt.values())[0]
+                    utt = list(utt.keys())[0]
+                else:
+                    data = dict()
+                message = Message('test_utterance',
+                                  {"utterances": [utt], "lang": lang})
+                self.intent_service.handle_utterance(message)
+                response = qa_response.call_args[0][0]
+                callback = qa_response.call_args[0][0]
+                self.assertIsInstance(response, Message)
+                self.assertTrue(response.data["phrase"] in utt)
+                self.assertEqual(response.data["skill_id"], self.skill.skill_id)
+                self.assertIn("callback_data", response.data.keys())
+                self.assertIsInstance(response.data["conf"], float)
+                self.assertIsInstance(response.data["answer"], str)
+
+                self.assertIsInstance(callback, Message)
+                self.assertEqual(callback.data['skill_id'], self.skill.skill_id)
+                self.assertEqual(callback.data['phrase'],
+                                 response.data['phrase'])
+                if not data:
+                    continue
+                if isinstance(data.get('callback'), dict):
+                    self.assertEqual(callback.data['callback_data'],
+                                     data['callback'])
+                elif isinstance(data.get('callback'), list):
+                    self.assertEqual(set(callback.data['callback_data'].keys()),
+                                     set(data.get('callback')))
+                if data.get('min_confidence'):
+                    self.assertGreaterEqual(response.data['conf'],
+                                            data['min_confidence'])
+                if data.get('max_confidence'):
+                    self.assertLessEqual(response.data['conf'],
+                                         data['max_confidence'])
 
 
 if __name__ == "__main__":
