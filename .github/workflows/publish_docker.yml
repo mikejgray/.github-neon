@@ -23,7 +23,7 @@ jobs:
   build_and_publish_docker:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version.cersion }}
+      version: ${{ steps.version.version }}
     permissions:
       contents: read
       packages: write
