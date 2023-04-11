@@ -5,10 +5,13 @@ on:
       intent_file:
         type: string
         default: test/test_intents.yaml
+      timeout:
+        type: number
+        default: 10
 jobs:
   test_intents_ovos:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: ${{inputs.timeout}}
     strategy:
       matrix:
         python-version: [ '3.10' ]
@@ -38,7 +41,7 @@ jobs:
           pytest action/github/test/test_skill_intents.py
   test_intents_neon:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: ${{inputs.timeout}}
     strategy:
       matrix:
         python-version: [ 3.7, '3.10' ]
