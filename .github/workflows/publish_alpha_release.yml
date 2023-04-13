@@ -26,6 +26,9 @@ on:
       changelog_file:
         type: string
         default: "CHANGELOG.md"
+      changelog_max_issues:
+        type: number
+        default: 50
     outputs:
       version:
         description: Updated Alpha version
@@ -86,6 +89,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           output: action/package/${{ inputs.changelog_file }}
           futureRelease: ${{needs.bump_version.outputs.version}}
+          maxIssues: ${{ inputs.changelog_max_issues }}
       - name: Push Changelog
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
