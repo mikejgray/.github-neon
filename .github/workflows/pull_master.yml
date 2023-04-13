@@ -5,11 +5,19 @@ on:
       pr_reviewer:
         required: false
         type: string
-        default: neonreviewers
       pr_assignee:
         required: false
         type: string
-        default: neondaniel
+      destination:
+        type: string
+        default: "master"
+      pr_title:
+        type: string
+      pr_body:
+        type: string
+      pr_draft:
+        type: boolean
+        default: true
 
 jobs:
   pull_changes:
@@ -22,4 +30,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           pr_reviewer: ${{ inputs.pr_reviewer }}
           pr_assignee: ${{ inputs.pr_assignee }}
-          pr_draft: true
+          pr_draft: ${{ inputs.pr_draft }}
+          pr_title: ${{ inputs.pr_title }}
+          pr_body: ${{ inputs.pr_body }}
