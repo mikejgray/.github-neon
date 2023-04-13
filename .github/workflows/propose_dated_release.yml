@@ -72,7 +72,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           output: ${{ inputs.changelog_file }}
-          unreleasedLabel: ${{ needs.bump_version.outputs.version }}
+          futureRelease: ${{needs.bump_version.outputs.version}}
       - name: Push Changelog
         uses: stefanzweifel/git-auto-commit-action@v4
         with:

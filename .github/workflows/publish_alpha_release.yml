@@ -85,6 +85,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           output: action/package/${{ inputs.changelog_file }}
+          futureRelease: ${{needs.bump_version.outputs.version}}
       - name: Push Changelog
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
