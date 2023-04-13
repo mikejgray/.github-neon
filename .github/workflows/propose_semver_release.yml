@@ -10,6 +10,22 @@ on:
       setup_py:
         type: string
         default: "setup.py"
+      update_changelog:
+        type: boolean
+        default: false
+      changelog_file:
+        type: string
+        default: "CHANGELOG.md"
+      branch:
+        type: string
+        default: "dev"
+    outputs:
+      version:
+        description: Updated version
+        value: ${{jobs.bump_version.outputs.version}}
+      changelog:
+        description: Changelog Contents
+        value: ${{jobs.update_changelog.outputs.changelog}}
 jobs:
   bump_version:
     runs-on: ubuntu-latest
@@ -39,4 +55,28 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Increment Version to ${{ steps.version.outputs.version }}
+          repository: action/package/
+  update_changelog:
+    needs: bump_version
+    runs-on: ubuntu-latest
+    if: ${{ inputs.update_changelog }}
+    outputs:
+      changelog: ${{ steps.changelog.outputs.changelog }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.branch }}
+          path: action/package/
+      - name: Generate Changelog
+        id: changelog
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          output: action/package/${{ inputs.changelog_file }}
+          unreleasedLabel: ${{ needs.bump_version.outputs.version }}
+      - name: Push Changelog
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update Changelog
           repository: action/package/
