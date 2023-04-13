@@ -1,0 +1,40 @@
+name: Propose Dated Stable Release
+on:
+  workflow_call:
+    inputs:
+      version_file:
+        type: string
+        default: "version.py"
+      setup_py:
+        type: string
+        default: "setup.py"
+jobs:
+  bump_version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.branch }}
+          path: action/package/
+      - name: Checkout Scripts Repo
+        uses: actions/checkout@v2
+        with:
+          path: action/github/
+          repository: NeonGeckoCom/.github
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.10"
+      - name: Increment Version
+        id: version
+        run: |
+          python action/github/scripts/dated_version_bump.py action/package/${{ inputs.version_file }} false
+          echo ::set-output name=version::$(python action/package/${{ inputs.setup_py }} --version)
+      - name: Push Version Change
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Increment Version to ${{ steps.version.outputs.version }}
+          repository: action/package/

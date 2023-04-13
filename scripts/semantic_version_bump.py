@@ -30,7 +30,7 @@ import fileinput
 from sys import argv
 
 
-def bump_version(version_file: str):
+def bump_version(version_file: str, version_spec: str):
     with open(version_file, "r", encoding="utf-8") as v:
         for line in v.readlines():
             if line.startswith("__version__"):
@@ -39,15 +39,44 @@ def bump_version(version_file: str):
                 else:
                     version = line.split("'")[1]
 
-    if "a" not in version:
-        parts = version.split('.')
-        parts[-1] = str(int(parts[-1]) + 1)
-        version = '.'.join(parts)
-        version = f"{version}a0"
+    # Parse version from string
+    parts = version.split('.')
+    if 'a' in parts[2]:
+        major = parts[0]
+        minor = parts[1]
+        patch, alpha = parts[2].split('a', 1)
+        was_alpha = True
     else:
-        post = version.split("a")[1]
-        new_post = int(post) + 1
-        version = version.replace(f"a{post}", f"a{new_post}")
+        major, minor, patch = parts
+        alpha = None
+        was_alpha = False
+
+    # Alpha Release
+    if version_spec == "alpha":
+        if not alpha:
+            alpha = 0
+            minor = int(minor) + 1
+        alpha = int(alpha) + 1
+    else:
+        alpha = None
+
+    # Stable Release
+    if version_spec == "patch":
+        if not was_alpha:
+            patch = int(patch) + 1
+    elif version_spec == "minor":
+        patch = 0
+        minor = int(minor) + 1
+    elif version_spec == "major":
+        patch = 0
+        minor = 0
+        major = int(major) + 1
+
+    # Build version string
+    if alpha:
+        version = f"{major}.{minor}.{patch}a{alpha}"
+    else:
+        version = f"{major}.{minor}.{patch}"
 
     for line in fileinput.input(version_file, inplace=True):
         if line.startswith("__version__"):
@@ -57,4 +86,9 @@ def bump_version(version_file: str):
 
 
 if __name__ == "__main__":
-    bump_version(argv[1])
+    file = argv[1]
+    if len(argv) > 2:
+        version_spec = argv[2]
+    else:
+        version_spec = "alpha"
+    bump_version(file, version_spec)

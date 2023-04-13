@@ -31,7 +31,7 @@ from datetime import datetime
 from sys import argv
 
 
-def bump_version(version_file: str):
+def bump_version(version_file: str, do_alpha: bool):
     with open(version_file, "r", encoding="utf-8") as v:
         for line in v.readlines():
             if line.startswith("__version__"):
@@ -41,13 +41,15 @@ def bump_version(version_file: str):
                     version = line.split("'")[1]
 
     date = datetime.now()
-    date_string = f"{str(date.year)[2:]}.{date.month}.{date.day}"
-    if 'a' in version and not version.endswith('a'):
-        alpha_ver = int(version.split('a')[1]) + 1
-    else:
-        alpha_ver = 1
+    version = f"{str(date.year)[2:]}.{date.month}.{date.day}"
 
-    version = f"{date_string}a{alpha_ver}"
+    if do_alpha:
+        if 'a' in version and not version.endswith('a'):
+            alpha_ver = int(version.split('a')[1]) + 1
+        else:
+            alpha_ver = 1
+
+        version = f"{version}a{alpha_ver}"
 
     for line in fileinput.input(version_file, inplace=True):
         if line.startswith("__version__"):
@@ -57,4 +59,10 @@ def bump_version(version_file: str):
 
 
 if __name__ == "__main__":
-    bump_version(argv[1])
+    file = argv[1]
+    if len(argv) > 2:
+        print(f"do_alpha={argv[2]}")
+        alpha = argv[2] == "true"
+    else:
+        alpha = True
+    bump_version(file, alpha)
