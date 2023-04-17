@@ -22,6 +22,18 @@ on:
       branch:
         type: string
         default: "dev"
+      alpha_var:
+        type: string
+        required: false
+      build_var:
+        type: string
+        required: false
+      minor_var:
+        type: string
+        required: false
+      major_var:
+        type: string
+        required: false
     outputs:
       version:
         description: Updated version
@@ -29,6 +41,7 @@ on:
       changelog:
         description: Changelog Contents
         value: ${{jobs.update_changelog.outputs.changelog}}
+
 jobs:
   bump_version:
     runs-on: ubuntu-latest
@@ -52,7 +65,12 @@ jobs:
       - name: Increment Version
         id: version
         run: |
-          python action/github/scripts/semantic_version_bump.py action/package/${{ inputs.version_file }} ${{ inputs.release_type }}
+          if [ -z ${{ inputs.alpha_var }} ]; then
+            python action/github/scripts/oneline_semantic_version_bump.py action/package/${{ inputs.version_file }} ${{ inputs.release_type }}
+          else
+            python action/github/scripts/multiline_semantic_version_bump.py action/package/${{ inputs.version_file }} \
+              ${{ inputs.release_type }} ${{ inputs.alpha_var }} ${{ inputs.build_var }} ${{ inputs.minor_var }} ${{ inputs.major_var }}
+          fi
           echo ::set-output name=version::$(python action/package/${{ inputs.setup_py }} --version)
       - name: Push Version Change
         uses: stefanzweifel/git-auto-commit-action@v4
