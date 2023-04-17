@@ -60,7 +60,7 @@ jobs:
         id: version
         run: |
           if [ ${{ inputs.version_scheme }} == "semver" ]; then
-            python action/github/scripts/semantic_version_bump.py action/package/${{ inputs.version_file }} alpha
+            python action/github/scripts/oneline_semantic_version_bump.py action/package/${{ inputs.version_file }} alpha
           elif [ ${{ inputs.version_scheme }} == "dated" ]; then
             python action/github/scripts/dated_version_bump.py action/package/${{ inputs.version_file }} true
           fi
