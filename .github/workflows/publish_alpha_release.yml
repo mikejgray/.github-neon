@@ -88,6 +88,7 @@ jobs:
         with:
           repository: ${{ github.repository }}
           excludes: draft,prerelease
+        continue-on-error: true
       - name: Generate Changelog
         id: changelog
         uses: heinrichreimer/github-changelog-generator-action@v2.3
