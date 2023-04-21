@@ -5,7 +5,12 @@ on:
       package-extras:
         required: false
         type: string
-
+      packages-exclude:
+        type: string
+        default: '^(precise-runner|fann2|tqdm|bs4|ovos-phal-plugin|ovos-skill|neon-core|nvidia|neon-phal-plugin|bitstruct).*'
+      licenses-exclude:
+        type: string
+        default: '^(Mozilla|NeonAI License v1.0).*$'
 jobs:
   license_tests:
     timeout-minutes: 15
@@ -40,8 +45,8 @@ jobs:
           requirements: 'requirements-all.txt'
           fail: 'Copyleft,Other,Error'
           fails-only: true
-          exclude: '^(precise-runner|fann2|tqdm|bs4|ovos-phal-plugin|ovos-skill|neon-core|nvidia|neon-phal-plugin|bitstruct).*'
-          exclude-license: '^(Mozilla|NeonAI License v1.0).*$'
+          exclude: ${{ inputs.packages-exclude }}
+          exclude-license: ${{ inputs.licenses-exclude }}
       - name: Print report
         if: ${{ always() }}
         run: echo "${{ steps.license_check_report.outputs.report }}"
