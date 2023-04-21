@@ -55,7 +55,7 @@ def bump_version(version_file: str, version_spec: str):
     if version_spec == "alpha":
         if not alpha:
             alpha = 0
-            minor = int(minor) + 1
+            patch = int(patch) + 1
         alpha = int(alpha) + 1
     else:
         alpha = None
