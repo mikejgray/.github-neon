@@ -2,6 +2,9 @@ name: Publish Docker Containers
 on:
   workflow_call:
     inputs:
+      runner:
+        type: string
+        default: "ubuntu-latest"
       base_tag:
         type: string
         required: false
@@ -21,7 +24,7 @@ env:
 
 jobs:
   build_and_publish_docker:
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runner}}
     outputs:
       version: ${{ steps.version.version }}
     permissions:

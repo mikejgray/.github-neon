@@ -2,6 +2,9 @@ name: Python Build Tests
 on:
   workflow_call:
     inputs:
+      runner:
+        type: string
+        default: "ubuntu-latest"
       python_version:
         required: false
         type: string
@@ -17,7 +20,7 @@ on:
 jobs:
   py_build_tests:
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runner}}
     steps:
       - uses: actions/checkout@v2
       - name: Set up python ${{ inputs.python_version }}

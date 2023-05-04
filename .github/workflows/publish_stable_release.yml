@@ -1,10 +1,14 @@
 name: Publish Stable Build
 on:
   workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: "ubuntu-latest"
 
 jobs:
   tag_release:
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runner}}
     steps:
       - uses: actions/checkout@v2
       - name: Get Version
@@ -16,7 +20,7 @@ jobs:
           token: ${{secrets.GITHUB_TOKEN}}
           tag: ${{env.VERSION}}
   build_and_publish_pypi:
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runner}}
     steps:
       - uses: actions/checkout@v2
       - name: Setup Python

@@ -2,6 +2,9 @@ name: Pull to Master
 on:
   workflow_call:
     inputs:
+      runner:
+        type: string
+        default: "ubuntu-latest"
       pr_reviewer:
         required: false
         type: string
@@ -21,7 +24,7 @@ on:
 
 jobs:
   pull_changes:
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runner}}
     steps:
       - uses: actions/checkout@v2
       - name: pull-request-action

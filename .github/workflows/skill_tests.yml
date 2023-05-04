@@ -1,13 +1,16 @@
 name: Skill Unit Tests
 on:
   workflow_call:
-
+    inputs:
+      runner:
+        type: string
+        default: "ubuntu-latest"
 jobs:
   neon_core:
     strategy:
       matrix:
         python-version: [ 3.7, 3.8, 3.9, '3.10' ]
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runner}}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2
@@ -29,7 +32,7 @@ jobs:
     strategy:
       matrix:
         python-version: [ 3.8 ]
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runner}}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2

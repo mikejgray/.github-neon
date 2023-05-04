@@ -2,6 +2,9 @@ name: Skill Unit Tests
 on:
   workflow_call:
     inputs:
+      runner:
+        type: string
+        default: "ubuntu-latest"
       intent_file:
         type: string
         default: test/test_intents.yaml
@@ -10,7 +13,7 @@ on:
         default: 10
 jobs:
   test_intents_ovos:
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runner}}
     timeout-minutes: ${{inputs.timeout}}
     strategy:
       matrix:
@@ -40,7 +43,7 @@ jobs:
           export INTENT_TEST_FILE="action/skill/${{inputs.intent_file}}"
           pytest action/github/test/test_skill_intents.py
   test_intents_neon:
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runner}}
     timeout-minutes: ${{inputs.timeout}}
     strategy:
       matrix:

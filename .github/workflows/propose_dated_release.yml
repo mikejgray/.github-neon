@@ -2,6 +2,9 @@ name: Propose Dated Stable Release
 on:
   workflow_call:
     inputs:
+      runner:
+        type: string
+        default: "ubuntu-latest"
       version_file:
         type: string
         default: "version.py"
@@ -29,7 +32,7 @@ on:
         value: action/package/${{jobs.update_changelog.outputs.changelog}}
 jobs:
   bump_version:
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runner}}
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
@@ -59,7 +62,7 @@ jobs:
           repository: action/package/
   update_changelog:
     needs: bump_version
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runner}}
     if: ${{ inputs.update_changelog }}
     outputs:
       changelog: ${{ steps.changelog.outputs.changelog }}
