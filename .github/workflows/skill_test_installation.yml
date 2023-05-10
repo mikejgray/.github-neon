@@ -11,10 +11,14 @@ on:
       repository:
         type: string
         default: ${{ github.repository }}
+      test_osm:
+        type: boolean
+        default: true
 jobs:
   test_osm_install:
     runs-on: ${{inputs.runner}}
     timeout-minutes: 5
+    if: ${{ inputs.test_osm }}
     strategy:
       matrix:
         python-version: [ 3.7, 3.8, 3.9, '3.10' ]
@@ -34,7 +38,7 @@ jobs:
           sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
           pip install --upgrade pip
           pip install pytest mock ovos-skills-manager
-      - name: Test Skill Intents
+      - name: Test OSM Installation
         run: |
           export TEST_REPO=${{inputs.repository}}
           export TEST_BRANCH=${{inputs.branch}}
