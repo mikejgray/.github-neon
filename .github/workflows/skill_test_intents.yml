@@ -10,7 +10,13 @@ on:
         default: test/test_intents.yaml
       timeout:
         type: number
-        default: 10
+        default: 15
+      test_padatious:
+        type: boolean
+        default: False
+      test_padacioso:
+        type: boolean
+        default: True
 jobs:
   test_intents_ovos:
     runs-on: ${{inputs.runner}}
@@ -37,9 +43,17 @@ jobs:
           sudo apt update
           sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
           pip install --upgrade pip
-          pip install pytest mock ovos-core[skills] action/skill/
-      - name: Test Skill Intents
+          pip install pytest mock ovos-core[skills,skills_lgpl] action/skill/
+      - name: Test Skill Intents Padacioso
+        if: ${{ inputs.test_padacioso }}
         run: |
+          export INTENT_ENGINE="padacioso"
+          export INTENT_TEST_FILE="action/skill/${{inputs.intent_file}}"
+          pytest action/github/test/test_skill_intents.py
+      - name: Test Skill Intents Padatious
+        if: ${{ inputs.test_padatious }}
+        run: |
+          export INTENT_ENGINE="padatious"
           export INTENT_TEST_FILE="action/skill/${{inputs.intent_file}}"
           pytest action/github/test/test_skill_intents.py
   test_intents_neon:
@@ -68,7 +82,15 @@ jobs:
           sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
           pip install --upgrade pip
           pip install pytest mock git+https://github.com/NeonGeckoCom/NeonCore#egg=neon_core action/skill/
-      - name: Test Skill Intents
+      - name: Test Skill Intents Padacioso
+        if: ${{ inputs.test_padacioso }}
         run: |
+          export INTENT_ENGINE="padacioso"
+          export INTENT_TEST_FILE="action/skill/${{inputs.intent_file}}"
+          pytest action/github/test/test_skill_intents.py
+      - name: Test Skill Intents Padatious
+        if: ${{ inputs.test_padatious }}
+        run: |
+          export INTENT_ENGINE="padatious"
           export INTENT_TEST_FILE="action/skill/${{inputs.intent_file}}"
           pytest action/github/test/test_skill_intents.py
