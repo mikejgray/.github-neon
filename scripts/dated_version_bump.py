@@ -50,7 +50,8 @@ def bump_version(version_file: str, do_alpha: bool):
             alpha_ver = 1
 
         version = f"{base_ver}a{alpha_ver}"
-
+    else:
+        version = base_ver
     for line in fileinput.input(version_file, inplace=True):
         if line.startswith("__version__"):
             print(f"__version__ = \"{version}\"")
