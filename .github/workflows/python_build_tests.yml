@@ -17,6 +17,12 @@ on:
         required: false
         type: string
         default: "test/**"
+      test_pipaudit:
+        type: boolean
+        default: false
+      pipaudit_ignored:
+        type: string
+        default: "GHSA-r9hx-vwmv-q579 PYSEC-2022-43012"
 jobs:
   py_build_tests:
     timeout-minutes: 15
@@ -38,3 +44,8 @@ jobs:
         uses: tj-actions/check-manifest@v1
         with:
           args: --ignore ${{ inputs.manifest_ignored }}
+      - name: PIP Audit
+        if: ${{ inputs.test_pipaudit }}
+        uses: pypa/gh-action-pip-audit@v1.0.7
+        with:
+          ignore-vulns: ${{ inputs.pipaudit_ignored }}
