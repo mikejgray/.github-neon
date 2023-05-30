@@ -1,2 +1,4 @@
 neon-utils~=1.2
 ovos-skills-manager~=0.0
+cattrs != 23.1.0
+# TODO: cattrs patching https://github.com/python-attrs/cattrs/issues/369
