@@ -8,6 +8,9 @@ on:
       version_file:
         type: string
         default: "version.py"
+      on_version_change:
+        type: string
+        default: ""
       release_type:
         type: string
       setup_py:
@@ -75,6 +78,10 @@ jobs:
               ${{ inputs.release_type }} ${{ inputs.alpha_var }} ${{ inputs.build_var }} ${{ inputs.minor_var }} ${{ inputs.major_var }}
           fi
           echo ::set-output name=version::$(python action/package/${{ inputs.setup_py }} --version)
+      - name: Run Extra Update Script
+        if: "${{ inputs.on_version_change != '' }}"
+        run: |
+          python action/package/${{ inputs.on_version_change }} ${{ steps.version.outputs.version }}
       - name: Push Version Change
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
