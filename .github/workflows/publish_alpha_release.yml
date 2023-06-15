@@ -140,7 +140,7 @@ jobs:
       - name: Build Distribution Packages
         run: |
           cd action/package
-          python ${{ inputs.setup_py }} bdist_wheel
+          python ${{ inputs.setup_py }} sdist bdist_wheel
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
