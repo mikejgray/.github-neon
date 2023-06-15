@@ -1,6 +1,9 @@
 name: Publish Stable Build
 on:
   workflow_call:
+    secrets:
+      PYPI_TOKEN:
+        required: true
     inputs:
       runner:
         type: string
@@ -22,15 +25,15 @@ jobs:
   build_and_publish_pypi:
     runs-on: ${{inputs.runner}}
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.8
+          python-version: "3.10"
       - name: Install Build Tools
         run: |
           python -m pip install build wheel
-
       - name: Build Distribution Packages
         run: |
           python setup.py sdist bdist_wheel
