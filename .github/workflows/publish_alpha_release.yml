@@ -38,6 +38,18 @@ on:
       changelog_max_issues:
         type: number
         default: 50
+      alpha_var:
+        type: string
+        required: false
+      build_var:
+        type: string
+        required: false
+      minor_var:
+        type: string
+        required: false
+      major_var:
+        type: string
+        required: false
     outputs:
       version:
         description: Updated Alpha version
@@ -68,7 +80,10 @@ jobs:
       - name: Increment Alpha Version
         id: version
         run: |
-          if [ ${{ inputs.version_scheme }} == "semver" ]; then
+          if [ -n ${{ inputs.alpha_var }} ]; then
+            python action/github/scripts/multiline_semantic_version_bump.py action/package/${{ inputs.version_file }} \
+              alpha ${{ inputs.alpha_var }} ${{ inputs.build_var }} ${{ inputs.minor_var }} ${{ inputs.major_var }}
+          elif [ ${{ inputs.version_scheme }} == "semver" ]; then
             python action/github/scripts/oneline_semantic_version_bump.py action/package/${{ inputs.version_file }} alpha
           elif [ ${{ inputs.version_scheme }} == "dated" ]; then
             python action/github/scripts/dated_version_bump.py action/package/${{ inputs.version_file }} true
