@@ -80,7 +80,7 @@ jobs:
       - name: Increment Alpha Version
         id: version
         run: |
-          if [ -n ${{ inputs.alpha_var }} ]; then
+          if [ -n "${{ inputs.alpha_var }}" ]; then
             python action/github/scripts/multiline_semantic_version_bump.py action/package/${{ inputs.version_file }} \
               alpha ${{ inputs.alpha_var }} ${{ inputs.build_var }} ${{ inputs.minor_var }} ${{ inputs.major_var }}
           elif [ ${{ inputs.version_scheme }} == "semver" ]; then
