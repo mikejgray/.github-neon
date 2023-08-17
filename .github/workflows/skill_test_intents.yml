@@ -17,13 +17,20 @@ on:
       test_padacioso:
         type: boolean
         default: True
+      neon_versions:
+        type: string
+        default: "[ 3.7, 3.8, 3.9, '3.10' ]"
+      ovos_versions:
+        type: string
+        default: "[ 3.8, '3.10' ]"
 jobs:
   test_intents_ovos:
+    if: "${{ inputs.ovos_versions != '' }}"
     runs-on: ${{inputs.runner}}
     timeout-minutes: ${{inputs.timeout}}
     strategy:
       matrix:
-        python-version: [ '3.10' ]
+        python-version: ${{ fromJSON(inputs.ovos_versions) }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -59,11 +66,12 @@ jobs:
           export INTENT_TEST_FILE="action/skill/${{inputs.intent_file}}"
           pytest action/github/test/test_skill_intents.py
   test_intents_neon:
+    if: "${{ inputs.neon_versions != '' }}"
     runs-on: ${{inputs.runner}}
     timeout-minutes: ${{inputs.timeout}}
     strategy:
       matrix:
-        python-version: [ 3.7, '3.10' ]
+        python-version: ${{ fromJSON(inputs.neon_versions) }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -83,9 +91,7 @@ jobs:
           sudo apt update
           sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
           pip install --upgrade pip
-          pip install wheel "cython<3.0.0"  # TODO: cython patching https://github.com/yaml/pyyaml/issues/724
-          pip install --no-build-isolation pyyaml~=5.4  # TODO: patching https://github.com/yaml/pyyaml/issues/724
-          pip install pytest mock git+https://github.com/NeonGeckoCom/NeonCore#egg=neon_core action/skill/
+          pip install pytest mock git+https://github.com/NeonGeckoCom/NeonCore@master#egg=neon_core action/skill/
       - name: Test Skill Intents Padacioso
         if: ${{ inputs.test_padacioso }}
         run: |

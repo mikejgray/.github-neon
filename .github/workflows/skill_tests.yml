@@ -5,11 +5,18 @@ on:
       runner:
         type: string
         default: "ubuntu-latest"
+      neon_versions:
+        type: string
+        default: "[ 3.7, 3.8, 3.9, '3.10' ]"
+      ovos_versions:
+        type: string
+        default: "[ 3.8, '3.10' ]"
 jobs:
   neon_core:
+    if: "${{ inputs.neon_versions != '' }}"
     strategy:
       matrix:
-        python-version: [ 3.7, 3.8, 3.9, '3.10' ]
+        python-version: ${{ fromJSON(inputs.neon_versions) }}
     runs-on: ${{inputs.runner}}
     timeout-minutes: 15
     steps:
@@ -31,9 +38,10 @@ jobs:
         run: |
           pytest test/test_skill.py
   ovos-core:
+    if: "${{ inputs.ovos_versions != '' }}"
     strategy:
       matrix:
-        python-version: [ 3.8 ]
+        python-version: ${{ fromJSON(inputs.ovos_versions) }}
     runs-on: ${{inputs.runner}}
     timeout-minutes: 15
     steps:
