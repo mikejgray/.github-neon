@@ -20,6 +20,10 @@ on:
       image_name:
         type: string
         default: ${{ github.repository }}
+      platforms:
+        type: string
+        required: false
+        default: linux/amd64
 
 env:
   REGISTRY: ${{ inputs.registry }}
@@ -35,7 +39,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
 
@@ -76,6 +80,7 @@ jobs:
           tags: ${{ steps.base_meta.outputs.tags }}
           labels: ${{ steps.base_meta.outputs.labels }}
           target: ${{ inputs.base_tag }}
+          platforms: ${{ inputs.platforms }}
 
       - name: Extract metadata for extra Docker
         if: "${{ inputs.extra_tag != '' }}"
@@ -95,3 +100,4 @@ jobs:
           tags: ${{ steps.extra_meta.outputs.tags }}
           labels: ${{ steps.extra_meta.outputs.labels }}
           target: ${{ inputs.extra_tag }}
+          platforms: ${{ inputs.platforms }}
