@@ -38,4 +38,5 @@ jobs:
       - name: Test Skill Resources
         run: |
           export RESOURCE_TEST_FILE="action/skill/${{inputs.resource_file}}"
+          export TEST_SKILL_ENTRYPOINT="action/skill/"
           pytest action/github/test/test_skill_resources.py
