@@ -33,7 +33,8 @@ jobs:
           pip install --upgrade pip
           pip install wheel "cython<3.0.0"  # TODO: cython patching https://github.com/yaml/pyyaml/issues/724
           pip install --no-build-isolation pyyaml~=5.4  # TODO: patching https://github.com/yaml/pyyaml/issues/724
-          pip install pytest mock ovos-core[skills]>=0.0.7 action/skill/
+          pip install ovos-core[skills]>=0.0.7 pytest mock neon-minerva~=0.1  # TODO: Left for backwards-compat
+          pip install action/skill[test]
       - name: Test Skill Resources
         run: |
           export RESOURCE_TEST_FILE="action/skill/${{inputs.resource_file}}"
