@@ -24,6 +24,13 @@ on:
         type: string
         required: false
         default: linux/amd64
+      dockerfile:
+        type: string
+        default: Dockerfile
+      build_args:
+        type: string
+      extra_build_args:
+        type: string
 
 env:
   REGISTRY: ${{ inputs.registry }}
@@ -44,7 +51,7 @@ jobs:
           ref: ${{ github.ref }}
 
       - name: Log in to the Container registry
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -73,7 +80,7 @@ jobs:
             type=semver,pattern={{version}},value=${{ steps.version.outputs.version }}
             type=ref,event=branch
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: true
@@ -81,6 +88,11 @@ jobs:
           labels: ${{ steps.base_meta.outputs.labels }}
           target: ${{ inputs.base_tag }}
           platforms: ${{ inputs.platforms }}
+          file: ${{ inputs.dockerfile }}
+          build-args: |
+            ${{ inputs.build_args}}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Extract metadata for extra Docker
         if: "${{ inputs.extra_tag != '' }}"
@@ -93,7 +105,7 @@ jobs:
             type=ref,event=branch
       - name: Build and push extra Docker image
         if: "${{ inputs.extra_tag != '' }}"
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: true
@@ -101,3 +113,8 @@ jobs:
           labels: ${{ steps.extra_meta.outputs.labels }}
           target: ${{ inputs.extra_tag }}
           platforms: ${{ inputs.platforms }}
+          file: ${{ inputs.dockerfile }}
+          build-args: |
+            ${{ inputs.extra_build_args }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
