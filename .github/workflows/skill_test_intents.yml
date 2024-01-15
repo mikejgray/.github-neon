@@ -8,6 +8,9 @@ on:
       intent_file:
         type: string
         default: test/test_intents.yaml
+      skill_entrypoint:
+        type: string
+        default: action/skill/
       timeout:
         type: number
         default: 15
@@ -52,16 +55,19 @@ jobs:
           pip install --upgrade pip
           pip install wheel "cython<3.0.0"  # TODO: cython patching https://github.com/yaml/pyyaml/issues/724
           pip install --no-build-isolation pyyaml~=5.4  # TODO: patching https://github.com/yaml/pyyaml/issues/724
-          pip install pytest mock ovos-core[skills,skills_lgpl]>=0.0.7 action/skill/
+          cd action/skill
+          pip install pytest mock ovos-core[skills]>=0.0.7 .[test]
       - name: Test Skill Intents Padacioso
         if: ${{ inputs.test_padacioso }}
         run: |
+          export TEST_SKILL_ENTRYPOINT="${{inputs.skill_entrypoint}}"
           export INTENT_ENGINE="padacioso"
           export INTENT_TEST_FILE="action/skill/${{inputs.intent_file}}"
           pytest action/github/test/test_skill_intents.py
       - name: Test Skill Intents Padatious
         if: ${{ inputs.test_padatious }}
         run: |
+          export TEST_SKILL_ENTRYPOINT="${{inputs.skill_entrypoint}}"
           export INTENT_ENGINE="padatious"
           export INTENT_TEST_FILE="action/skill/${{inputs.intent_file}}"
           pytest action/github/test/test_skill_intents.py
@@ -91,16 +97,19 @@ jobs:
           sudo apt update
           sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
           pip install --upgrade pip
-          pip install pytest mock git+https://github.com/NeonGeckoCom/NeonCore@master#egg=neon_core action/skill/
+          cd action/skill
+          pip install pytest mock git+https://github.com/NeonGeckoCom/NeonCore@master#egg=neon_core .[test]
       - name: Test Skill Intents Padacioso
         if: ${{ inputs.test_padacioso }}
         run: |
+          export TEST_SKILL_ENTRYPOINT="${{inputs.skill_entrypoint}}"
           export INTENT_ENGINE="padacioso"
           export INTENT_TEST_FILE="action/skill/${{inputs.intent_file}}"
           pytest action/github/test/test_skill_intents.py
       - name: Test Skill Intents Padatious
         if: ${{ inputs.test_padatious }}
         run: |
+          export TEST_SKILL_ENTRYPOINT="${{inputs.skill_entrypoint}}"
           export INTENT_ENGINE="padatious"
           export INTENT_TEST_FILE="action/skill/${{inputs.intent_file}}"
           pytest action/github/test/test_skill_intents.py
