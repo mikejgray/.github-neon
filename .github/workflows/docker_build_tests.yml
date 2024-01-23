@@ -5,6 +5,10 @@ on:
       runner:
         type: string
         default: "ubuntu-latest"
+      platforms:
+        type: string
+        required: false
+        default: linux/amd64
 jobs:
   docker_build_tests:
     timeout-minutes: 15
@@ -12,7 +16,10 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Build image
-        run: docker build .
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: ${{ inputs.platforms }}
+          install: true
+      - name: Build image
+        run: docker build --platform=${{ inputs.platforms }} .
