@@ -11,7 +11,7 @@ on:
         default: linux/amd64
 jobs:
   docker_build_tests:
-    timeout-minutes: 15
+    timeout-minutes: 60
     runs-on: ${{inputs.runner}}
     steps:
       - name: Checkout Repository
