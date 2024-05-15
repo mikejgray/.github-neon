@@ -7,7 +7,7 @@ on:
         default: "ubuntu-latest"
       neon_versions:
         type: string
-        default: "[ 3.7, 3.8, 3.9, '3.10' ]"
+        default: "[ 3.8, 3.9, '3.10', '3.11' ]"
       ovos_versions:
         type: string
         default: "[ 3.8, '3.10' ]"
@@ -20,11 +20,12 @@ jobs:
     runs-on: ${{inputs.runner}}
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
       - name: Install Dependencies
         run: |
           sudo apt update
@@ -45,11 +46,12 @@ jobs:
     runs-on: ${{inputs.runner}}
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
       - name: Install Dependencies
         run: |
           sudo apt update
